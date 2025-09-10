@@ -4,7 +4,7 @@
 
 [![GitHub Issues](https://img.shields.io/github/issues/Ch0daboy/ezstack)](https://github.com/Ch0daboy/ezstack/issues)
 [![Milestones](https://img.shields.io/badge/Milestones-5-blue)](https://github.com/Ch0daboy/ezstack/milestones)
-[![Project Board](https://img.shields.io/badge/Project-Roadmap-green)](https://github.com/users/Ch0daboy/projects/7)
+[![Project Board](https://img.shields.io/badge/Project-Roadmap-green)](https://github.com/users/Ch0daboy/projects/8)
 
 ## 🎯 Product Vision
 
