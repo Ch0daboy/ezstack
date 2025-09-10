@@ -1,6 +1,9 @@
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { Webhook } from 'svix'
+import { WebhookEvent } from '@clerk/nextjs/server'
+import { userOperations } from '@/lib/db/helpers'
+import type { UserInsert } from '@/lib/types/database'
 
 export async function POST(req: Request) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET
@@ -24,50 +27,113 @@ export async function POST(req: Request) {
 
   const wh = new Webhook(WEBHOOK_SECRET)
 
-  let evt: { data: { id: string }, type: string }
+  let evt: WebhookEvent
 
   try {
     evt = wh.verify(body, {
       "svix-id": svix_id,
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
-    }) as { data: { id: string }, type: string }
+    }) as WebhookEvent
   } catch (err) {
     console.error('Error verifying webhook:', err)
     return new Response('Error occurred', { status: 400 })
   }
 
-  const { id } = evt.data
   const eventType = evt.type
+  console.log(`Webhook with type ${eventType} received`)
 
-  console.log(`Webhook with ID of ${id} and type of ${eventType}`)
+  // Handle user.created event
+  if (eventType === 'user.created') {
+    const { id, email_addresses, first_name, last_name } = evt.data
 
-  // Handle different event types
-  switch (eventType) {
-    case 'user.created':
-      console.log('User created:', evt.data)
-      // TODO: Create user in Supabase
-      // await createUserInSupabase({
-      //   clerkId: evt.data.id,
-      //   email: evt.data.email_addresses[0]?.email_address,
-      //   firstName: evt.data.first_name,
-      //   lastName: evt.data.last_name,
-      // })
-      break
-    
-    case 'user.updated':
-      console.log('User updated:', evt.data)
-      // TODO: Update user in Supabase
-      break
-    
-    case 'user.deleted':
-      console.log('User deleted:', evt.data)
-      // TODO: Delete or anonymize user in Supabase
-      break
-    
-    default:
-      console.log(`Unhandled webhook event: ${eventType}`)
+    try {
+      // Check if user already exists
+      let user
+      try {
+        user = await userOperations.getByClerkId(id)
+      } catch (error) {
+        // User doesn't exist, create it
+        const userData: UserInsert = {
+          clerk_id: id,
+          subscription_tier: 'free',
+          credits_remaining: 100, // Initial free credits
+          settings: {
+            email_notifications: true,
+            research_preferences: {
+              enabled: true,
+              depth: 'moderate',
+              fact_checking: true,
+              sources_required: 3
+            }
+          }
+        }
+
+        user = await userOperations.create(userData)
+        console.log('User created in Supabase:', user.id)
+      }
+
+      return NextResponse.json({ 
+        message: 'User synced successfully',
+        userId: user.id 
+      })
+    } catch (error) {
+      console.error('Error creating user in Supabase:', error)
+      return new Response('Error syncing user', { status: 500 })
+    }
   }
 
-  return NextResponse.json({ received: true })
+  // Handle user.updated event
+  if (eventType === 'user.updated') {
+    const { id } = evt.data
+
+    try {
+      const user = await userOperations.getByClerkId(id)
+      
+      if (user) {
+        console.log('User update event received for:', user.id)
+      }
+
+      return NextResponse.json({ 
+        message: 'User update processed',
+        userId: user?.id 
+      })
+    } catch (error) {
+      console.error('Error updating user:', error)
+      return new Response('Error updating user', { status: 500 })
+    }
+  }
+
+  // Handle user.deleted event
+  if (eventType === 'user.deleted') {
+    const { id } = evt.data
+
+    try {
+      const user = await userOperations.getByClerkId(id!)
+      
+      if (user) {
+        // Mark user as deleted but keep data for integrity
+        await userOperations.update(user.id, {
+          settings: {
+            ...user.settings,
+            account_status: 'deleted'
+          }
+        })
+        console.log('User marked as deleted:', user.id)
+      }
+
+      return NextResponse.json({ 
+        message: 'User deletion processed',
+        userId: user?.id 
+      })
+    } catch (error) {
+      console.error('Error processing user deletion:', error)
+      return new Response('Error processing deletion', { status: 500 })
+    }
+  }
+
+  return NextResponse.json({ 
+    message: 'Webhook received',
+    type: eventType 
+  })
 }
