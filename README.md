@@ -1,31 +1,142 @@
-# Next.js SaaS Starter Template
+# DevConsul - AI-Powered Customer Feedback Simulation Platform
 
-A complete, production-ready starter template for building SaaS applications with Next.js, featuring authentication, payments, email, analytics, and more.
+**Simulate real user experiences and gather actionable feedback automatically using AI personas and browser automation** 🤖
 
-## 🚀 Features
+[![GitHub Issues](https://img.shields.io/github/issues/Ch0daboy/ezstack)](https://github.com/Ch0daboy/ezstack/issues)
+[![Milestones](https://img.shields.io/badge/Milestones-5-blue)](https://github.com/Ch0daboy/ezstack/milestones)
+[![Project Board](https://img.shields.io/badge/Project-Roadmap-green)](https://github.com/users/Ch0daboy/projects/7)
 
-- **🔐 Authentication**: Clerk for user management and authentication
-- **💾 Database**: Supabase for PostgreSQL database and real-time subscriptions
-- **💳 Payments**: Stripe integration for subscriptions and one-time payments
-- **📧 Email**: Resend for transactional emails with beautiful templates
-- **⚡ Background Jobs**: Inngest for reliable background processing
-- **📊 Analytics**: PostHog for product analytics and user tracking
-- **🎨 UI Components**: shadcn/ui components with Tailwind CSS
-- **🌙 Dark Mode**: Built-in dark mode support with next-themes
-- **📱 Responsive**: Mobile-first responsive design
-- **🔒 Type Safety**: Full TypeScript support
+## 🎯 Product Vision
+
+DevConsul revolutionizes the way developers and product teams gather user feedback by using AI-powered personas to automatically test and interact with web applications. Instead of waiting for real user feedback or conducting expensive user testing sessions, DevConsul simulates diverse user behaviors and generates comprehensive reports on user experience issues, accessibility problems, and potential improvements.
+
+### Key Value Propositions
+- **🤖 AI-Powered Testing**: Leverages AWS Bedrock and GPT-OSS 120B to create intelligent user personas
+- **🎭 Realistic User Simulation**: Personas navigate your app like real users with varying technical abilities
+- **📊 Comprehensive Reports**: Detailed feedback on UX, performance, and accessibility
+- **🔄 Continuous Testing**: Schedule automated tests triggered by GitHub PRs or time intervals
+- **🐛 Automatic Issue Creation**: Convert findings directly into GitHub issues
+- **📈 Progress Tracking**: Compare test results over time to measure improvements
+
+## 🚀 Core Features
+
+### Persona Generation
+- **AI-Powered Analysis**: Analyzes your website/app to understand its purpose and target audience
+- **Diverse Personas**: Generates varied user personas with different:
+  - Demographics (age, location, profession)
+  - Technical proficiency levels
+  - Goals and motivations
+  - Accessibility needs
+- **Persona Library**: Save and reuse personas across different tests
+
+### Automated Testing
+- **Browser Automation**: Uses Playwright MCP server for real browser interactions
+- **Intelligent Navigation**: AI decides how to navigate and interact with your app
+- **Multi-step Workflows**: Tests complete user journeys, not just single pages
+- **Visual Recording**: Captures screenshots and videos of test sessions
+
+### Reporting & Insights
+- **Detailed Reports**: Comprehensive feedback on:
+  - User experience friction points
+  - Accessibility issues (WCAG compliance)
+  - Performance bottlenecks
+  - Broken functionality
+  - Content clarity issues
+- **Comparison Reports**: Track improvements between test runs
+- **Export Options**: Download reports as PDF or JSON
+
+### Integration & Automation
+- **GitHub Integration**: 
+  - OAuth connection for seamless workflow
+  - Automatic issue creation from findings
+  - PR comment summaries
+- **Scheduling Options**:
+  - Manual one-off tests
+  - Cron-based scheduling
+  - GitHub webhook triggers (on PR, push, etc.)
+- **Focus Areas**: Define specific areas or features to prioritize in testing
+
+## 🛠️ Technical Stack
+
+- **Framework**: Next.js 15 with App Router and Turbopack
+- **AI/ML**: AWS Bedrock (Claude, Titan) + GPT-OSS 120B
+- **Browser Automation**: Playwright via MCP protocol
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Clerk
+- **Payments**: Stripe
+- **Background Jobs**: Inngest
+- **Email**: Resend
+- **Analytics**: PostHog
+- **UI**: shadcn/ui + Tailwind CSS v4
+- **Type Safety**: TypeScript
+
+## 🗺️ Product Roadmap
+
+### Phase 1: Foundation & Architecture (Jan 2025)
+**Status**: 🔴 Not Started | [Milestone](https://github.com/Ch0daboy/ezstack/milestone/1)
+
+- [ ] Rebrand template to DevConsul
+- [ ] Set up AWS Bedrock integration
+- [ ] Design database schema for personas and test sessions
+- [ ] Configure Playwright MCP server
+- [ ] Implement basic dashboard structure
+
+### Phase 2: Core Features (Feb 2025)
+**Status**: 🔴 Not Started | [Milestone](https://github.com/Ch0daboy/ezstack/milestone/2)
+
+- [ ] Build persona generation engine
+- [ ] Implement browser automation with AI navigation
+- [ ] Create test session orchestrator
+- [ ] Develop basic reporting system
+- [ ] Add interaction recording
+
+### Phase 3: MVP Features (Mid-Feb 2025)
+**Status**: 🔴 Not Started | [Milestone](https://github.com/Ch0daboy/ezstack/milestone/3)
+
+- [ ] GitHub OAuth integration
+- [ ] Automatic issue creation
+- [ ] Advanced reporting with comparisons
+- [ ] Test scheduling system
+- [ ] Webhook triggers
+
+### Phase 4: Beta Testing (Mar 2025)
+**Status**: 🔴 Not Started | [Milestone](https://github.com/Ch0daboy/ezstack/milestone/4)
+
+- [ ] Performance optimization
+- [ ] Usage-based billing implementation
+- [ ] Beta user onboarding
+- [ ] Bug fixes and polish
+- [ ] Documentation
+
+### Phase 5: Product Launch (Mid-Mar 2025)
+**Status**: 🔴 Not Started | [Milestone](https://github.com/Ch0daboy/ezstack/milestone/5)
+
+- [ ] Public API development
+- [ ] Marketing website
+- [ ] ProductHunt launch
+- [ ] Customer support setup
+- [ ] Growth tracking
+
+## 📊 Pricing Plans (Planned)
+
+| Plan | Price | Features |
+|------|-------|----------|
+| **Starter** | $29/mo | 100 test sessions, 5 personas, Basic reporting |
+| **Professional** | $99/mo | 500 test sessions, Unlimited personas, Advanced reporting, GitHub integration |
+| **Enterprise** | Custom | Unlimited sessions, Priority support, Custom integrations, SLA |
 
 ## 📋 Prerequisites
 
 - Node.js 18+ and npm
 - Git
 - Accounts for the following services:
-  - [Clerk](https://clerk.com)
-  - [Supabase](https://supabase.com)
-  - [Stripe](https://stripe.com)
-  - [Resend](https://resend.com)
-  - [Inngest](https://inngest.com)
-  - [PostHog](https://posthog.com)
+  - [AWS](https://aws.amazon.com) - For Bedrock AI models
+  - [Clerk](https://clerk.com) - Authentication
+  - [Supabase](https://supabase.com) - Database
+  - [Stripe](https://stripe.com) - Payments
+  - [Resend](https://resend.com) - Email
+  - [Inngest](https://inngest.com) - Background jobs
+  - [PostHog](https://posthog.com) - Analytics
 
 ## 🛠️ Installation
 
@@ -59,6 +170,15 @@ A complete, production-ready starter template for building SaaS applications wit
 ### Environment Variables
 
 Copy `.env.local.example` to `.env.local` and configure the following:
+
+#### AWS Bedrock
+```env
+AWS_ACCESS_KEY_ID=AKIA...
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION=us-east-1
+BEDROCK_MODEL_ID=anthropic.claude-3-sonnet-20240229-v1:0
+```
+Set up AWS credentials with Bedrock access. [AWS Bedrock Setup Guide](https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started.html)
 
 #### Clerk Authentication
 ```env
