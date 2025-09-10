@@ -1,7 +1,7 @@
 import { inngest } from "./client"
 import { Resend } from "resend"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY || 'dummy-key-for-build')
 
 export const sendWelcomeEmail = inngest.createFunction(
   { id: "send-welcome-email", name: "Send Welcome Email" },

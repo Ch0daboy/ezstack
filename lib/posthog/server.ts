@@ -14,7 +14,7 @@ export async function captureServerEvent({
 }: {
   distinctId: string
   event: string
-  properties?: Record<string, any>
+  properties?: Record<string, unknown>
 }) {
   posthogServer.capture({
     distinctId,

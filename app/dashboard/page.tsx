@@ -26,7 +26,7 @@ export default function DashboardPage() {
       } else {
         toast.error('Failed to send test email')
       }
-    } catch (error) {
+    } catch {
       toast.error('Error sending email')
     } finally {
       setLoading(false)

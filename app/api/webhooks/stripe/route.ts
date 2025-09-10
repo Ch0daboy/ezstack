@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   const body = await req.text()
   const signature = (await headers()).get('stripe-signature')!
 
-  let event: any
+  let event: import('stripe').Stripe.Event
 
   try {
     event = stripe.webhooks.constructEvent(
@@ -15,8 +15,8 @@ export async function POST(req: Request) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     )
-  } catch (error: any) {
-    console.error('Webhook signature verification failed:', error.message)
+  } catch (error: unknown) {
+    console.error('Webhook signature verification failed:', error instanceof Error ? error.message : 'Unknown error')
     return NextResponse.json(
       { error: 'Invalid signature' },
       { status: 400 }
