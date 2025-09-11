@@ -13,6 +13,18 @@ import type {
 
 // User Operations
 export const userOperations = {
+  async getById(id: string, isServer = true) {
+    const supabase = isServer ? await createServerClient() : createBrowserClient()
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', id)
+      .single()
+    
+    if (error) throw error
+    return data as User
+  },
+
   async getByClerkId(clerkId: string, isServer = true) {
     const supabase = isServer ? await createServerClient() : createBrowserClient()
     const { data, error } = await supabase
