@@ -49,8 +49,8 @@ export class PerplexityService {
   private apiKey: string;
   private baseUrl = 'https://api.perplexity.ai';
 
-  constructor() {
-    this.apiKey = process.env.PERPLEXITY_API_KEY || '';
+  constructor(apiKey?: string) {
+    this.apiKey = apiKey || process.env.PERPLEXITY_API_KEY || '';
     if (!this.apiKey) {
       console.warn('Perplexity API key not configured');
     }
@@ -342,6 +342,32 @@ export class PerplexityService {
     }
     
     return results;
+  }
+
+  async search(options: {
+    query: string;
+    maxResults?: number;
+    includeImages?: boolean;
+  }): Promise<{
+    results: Array<{
+      title: string;
+      url: string;
+      snippet: string;
+    }>;
+  }> {
+    try {
+      const result = await this.researchTopic(options.query, '', 'fact_check');
+      return {
+        results: result.sources.slice(0, options.maxResults || 5).map(source => ({
+          title: source.title,
+          url: source.url,
+          snippet: source.snippet || result.findings.substring(0, 200)
+        }))
+      };
+    } catch (error) {
+      console.error('Search error:', error);
+      return { results: [] };
+    }
   }
 }
 

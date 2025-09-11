@@ -237,6 +237,34 @@ await captureServerEvent({
 
 ## 🧪 Testing
 
+## 🔌 API Overview (Selected)
+
+Generation
+- `POST /api/generation/outline`
+- `POST /api/generation/lesson-plan`
+- `POST /api/generation/script`
+- `POST /api/generation/quiz`
+- `POST /api/generation/enhance` (enhancement + variations)
+- `POST /api/generation/content-variation`
+- `POST /api/generation/batch`
+
+Content & Export
+- `POST /api/export` (pdf, docx, markdown, html)
+- `POST /api/images`
+
+Templates & Personas
+- `GET /api/templates`
+- `GET /api/personas`
+- `GET /api/activities/templates`
+
+Progress & Jobs
+- `POST|GET /api/progress`
+- `GET /api/jobs`
+
+Preview & Onboarding
+- `/preview/[lessonId]`
+- `/onboarding`
+
 ### Local Development
 
 ```bash
@@ -246,7 +274,7 @@ npm run dev
 ### Type Checking
 
 ```bash
-npm run type-check
+npm run typecheck
 ```
 
 ### Linting

@@ -1,4 +1,4 @@
-import { PerplexityClient } from './perplexity'
+import { PerplexityService } from './perplexity'
 
 export interface FactCheckResult {
   claim: string
@@ -26,10 +26,10 @@ export interface ContentFactCheck {
 }
 
 export class FactChecker {
-  private perplexity: PerplexityClient
+  private perplexity: PerplexityService
 
   constructor(apiKey?: string) {
-    this.perplexity = new PerplexityClient(apiKey)
+    this.perplexity = new PerplexityService(apiKey)
   }
 
   /**

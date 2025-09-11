@@ -1,5 +1,5 @@
-import { createBrowserClient } from '@/lib/supabase/client'
-import { createServerClient } from '@/lib/supabase/server'
+import { createClient as createBrowserClient } from '@/lib/supabase/client'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 import type {
   User, UserInsert, UserUpdate,
   Course, CourseInsert, CourseUpdate,
@@ -8,7 +8,9 @@ import type {
   Template, TemplateInsert, TemplateUpdate,
   Persona, PersonaInsert, PersonaUpdate,
   GeneratedImage, GeneratedImageInsert,
-  GenerationJob, GenerationJobInsert, GenerationJobUpdate
+  GenerationJob, GenerationJobInsert, GenerationJobUpdate,
+  StudentProgress, StudentProgressInsert, StudentProgressUpdate,
+  Assessment, AssessmentInsert, AssessmentUpdate
 } from '@/lib/types/database'
 
 // User Operations
@@ -561,5 +563,60 @@ export const generationJobOperations = {
       error_message: error,
       completed_at: new Date().toISOString()
     }, isServer)
+  }
+}
+
+// Student Progress Operations
+export const progressOperations = {
+  async upsert(progress: StudentProgressInsert, isServer = true) {
+    const supabase = isServer ? await createServerClient() : createBrowserClient()
+    const { data, error } = await supabase
+      .from('student_progress')
+      .upsert(progress, { onConflict: 'user_id,course_id,lesson_id' })
+      .select()
+      .single()
+
+    if (error) throw error
+    return data as StudentProgress
+  },
+
+  async getForCourse(userId: string, courseId: string, isServer = true) {
+    const supabase = isServer ? await createServerClient() : createBrowserClient()
+    const { data, error } = await supabase
+      .from('student_progress')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('course_id', courseId)
+      .order('last_viewed_at', { ascending: false })
+
+    if (error) throw error
+    return data as StudentProgress[]
+  }
+}
+
+// Assessment Operations
+export const assessmentOperations = {
+  async create(assessment: AssessmentInsert, isServer = true) {
+    const supabase = isServer ? await createServerClient() : createBrowserClient()
+    const { data, error } = await supabase
+      .from('assessments')
+      .insert(assessment)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data as Assessment
+  },
+
+  async listByLesson(lessonId: string, isServer = true) {
+    const supabase = isServer ? await createServerClient() : createBrowserClient()
+    const { data, error } = await supabase
+      .from('assessments')
+      .select('*')
+      .eq('lesson_id', lessonId)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data as Assessment[]
   }
 }

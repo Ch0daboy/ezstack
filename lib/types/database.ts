@@ -112,6 +112,9 @@ export interface Activity {
   duration_minutes?: number
   resources?: string[]
   assessment_criteria?: string[]
+  // Optional quiz-specific fields
+  questions?: any[]
+  question_types?: string[]
 }
 
 // Content Variation Types
@@ -213,6 +216,33 @@ export interface GeneratedImage {
   created_at: string
 }
 
+// Student Progress Types
+export interface StudentProgress {
+  id: string
+  user_id: string
+  course_id: string
+  lesson_id: string | null
+  status: 'not_started' | 'in_progress' | 'completed'
+  progress_percent: number
+  last_viewed_at: string
+  created_at: string
+  updated_at: string
+}
+
+// Assessments
+export interface Assessment {
+  id: string
+  course_id: string | null
+  lesson_id: string | null
+  title: string
+  overview: string | null
+  questions: any[]
+  total_points: number
+  metadata: Record<string, any>
+  created_at: string
+  updated_at: string
+}
+
 // Generation Job Types
 export interface GenerationJob {
   id: string
@@ -305,6 +335,10 @@ export type PersonaInsert = Omit<Persona, 'id' | 'created_at' | 'updated_at'>
 export type PersonaUpdate = Partial<PersonaInsert>
 
 export type GeneratedImageInsert = Omit<GeneratedImage, 'id' | 'created_at'>
+export type StudentProgressInsert = Omit<StudentProgress, 'id' | 'created_at' | 'updated_at' | 'last_viewed_at'> & { last_viewed_at?: string }
+export type StudentProgressUpdate = Partial<Omit<StudentProgress, 'id' | 'user_id' | 'course_id'>>
+export type AssessmentInsert = Omit<Assessment, 'id' | 'created_at' | 'updated_at'>
+export type AssessmentUpdate = Partial<AssessmentInsert>
 
 export type GenerationJobInsert = Omit<GenerationJob, 'id' | 'created_at' | 'started_at' | 'completed_at'>
 export type GenerationJobUpdate = Partial<Omit<GenerationJob, 'id' | 'created_at' | 'user_id'>>

@@ -62,6 +62,11 @@ export interface LessonPlan {
 }
 
 export class BedrockService {
+  // Simple in-memory cache for AI text responses (best-effort, ephemeral)
+  private cache = new Map<string, { value: string; expiresAt: number }>()
+  private CACHE_TTL_MS = 10 * 60 * 1000 // 10 minutes
+  private CACHE_MAX = 50
+
   private async invokeClaudeModel(
     prompt: string,
     systemPrompt: string = '',
@@ -90,14 +95,91 @@ export class BedrockService {
     };
 
     try {
+      // Cache key based on model + payload
+      const cacheKey = `claude:${modelId}:${input.body}`
+      const now = Date.now()
+      const cached = this.cache.get(cacheKey)
+      if (cached && cached.expiresAt > now) {
+        return cached.value
+      }
+
       const command = new InvokeModelCommand(input);
       const response = await bedrockClient.send(command);
       
       const responseBody = JSON.parse(new TextDecoder().decode(response.body));
-      return responseBody.content[0].text;
+      const text = responseBody.content?.[0]?.text || ''
+
+      // Maintain cache size
+      if (this.cache.size >= this.CACHE_MAX) {
+        const firstKey = this.cache.keys().next().value
+        if (firstKey) this.cache.delete(firstKey)
+      }
+      this.cache.set(cacheKey, { value: text, expiresAt: now + this.CACHE_TTL_MS })
+
+      return text;
     } catch (error) {
       console.error('Bedrock invocation error:', error);
       throw error;
+    }
+  }
+
+  async generateQuiz(
+    topic: string,
+    learningObjectives: string[] = [],
+    questionCount: number = 10,
+    options: GenerationOptions = {}
+  ): Promise<{
+    title: string
+    overview: string
+    questions: Array<{
+      id: string
+      type: 'multiple_choice' | 'true_false' | 'short_answer' | 'matching' | 'fill_blank'
+      question: string
+      options?: string[]
+      correctAnswer?: string | number | string[]
+      explanation?: string
+      points?: number
+      difficulty?: 'easy' | 'medium' | 'hard'
+    }>
+    totalPoints: number
+  }> {
+    const systemPrompt = options.systemPrompt || `You are an expert assessment designer creating fair, clear quizzes that align to learning objectives. Always output valid JSON.`
+
+    const prompt = `Create a quiz for the topic: ${topic}
+Learning Objectives: ${learningObjectives.join(', ') || 'General understanding'}
+Number of Questions: ${questionCount}
+
+Include a mix of question types: multiple_choice, true_false, short_answer, matching or fill_blank. Make questions clear and unambiguous, with concise explanations.
+
+Return ONLY valid JSON with this structure:
+{
+  "title": "string",
+  "overview": "string",
+  "questions": [{
+    "id": "string",
+    "type": "multiple_choice|true_false|short_answer|matching|fill_blank",
+    "question": "string",
+    "options": ["string"],
+    "correctAnswer": "string|number|string[]",
+    "explanation": "string",
+    "points": 1,
+    "difficulty": "easy|medium|hard"
+  }],
+  "totalPoints": number
+}`
+
+    const response = await this.invokeClaudeModel(prompt, systemPrompt, {
+      ...options,
+      temperature: options.temperature ?? 0.7,
+      maxTokens: options.maxTokens ?? 3000,
+    })
+
+    try {
+      return JSON.parse(response)
+    } catch (error) {
+      const match = response.match(/\{[\s\S]*\}/)
+      if (match) return JSON.parse(match[0])
+      throw new Error('Failed to generate valid quiz JSON')
     }
   }
 

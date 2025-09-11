@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc -noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.883.0",

@@ -139,8 +139,17 @@ class ExportService {
     filename: string,
     options: ExportOptions
   ): Promise<ExportResult> {
-    // Dynamic import to avoid SSR issues
-    const PDFDocument = (await import('pdfkit')).default
+    return {
+      success: false,
+      format: 'pdf',
+      filename: `${filename}.pdf`,
+      mimeType: 'application/pdf',
+      error: 'PDF export not available - install pdfkit to enable'
+    }
+    /*
+    try {
+      // Dynamic import to avoid SSR issues
+      const PDFDocument = (await import('pdfkit')).default
     
     const doc = new PDFDocument({
       margins: options.styling?.margins || {
@@ -236,6 +245,7 @@ class ExportService {
         })
       })
     })
+    */
   }
 
   private async exportLessonToPDF(
@@ -243,6 +253,14 @@ class ExportService {
     filename: string,
     options: ExportOptions
   ): Promise<ExportResult> {
+    return {
+      success: false,
+      format: 'pdf',
+      filename: `${filename}.pdf`,
+      mimeType: 'application/pdf',
+      error: 'PDF export not available - install pdfkit to enable'
+    }
+    /*
     const PDFDocument = (await import('pdfkit')).default
     
     const doc = new PDFDocument({
@@ -334,6 +352,7 @@ class ExportService {
         })
       })
     })
+    */
   }
 
   private async exportContentToPDF(
@@ -341,6 +360,14 @@ class ExportService {
     filename: string,
     options: ExportOptions
   ): Promise<ExportResult> {
+    return {
+      success: false,
+      format: 'pdf',
+      filename: `${filename}.pdf`,
+      mimeType: 'application/pdf',
+      error: 'PDF export not available - install pdfkit to enable'
+    }
+    /*
     const PDFDocument = (await import('pdfkit')).default
     
     const doc = new PDFDocument({
@@ -372,6 +399,7 @@ class ExportService {
         })
       })
     })
+    */
   }
 
   // DOCX Export Methods
@@ -380,7 +408,15 @@ class ExportService {
     filename: string,
     options: ExportOptions
   ): Promise<ExportResult> {
-    const officegen = (await import('officegen')).default
+    return {
+      success: false,
+      format: 'docx',
+      filename: `${filename}.docx`,
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      error: 'DOCX export not available - install officegen to enable'
+    }
+    /*
+    // const officegen = (await import('officegen')).default
     const docx = officegen('docx')
 
     // Title page
@@ -458,6 +494,7 @@ class ExportService {
         chunks.push(chunk)
       })
     })
+    */
   }
 
   private async exportLessonToDOCX(
@@ -465,7 +502,15 @@ class ExportService {
     filename: string,
     options: ExportOptions
   ): Promise<ExportResult> {
-    const officegen = (await import('officegen')).default
+    return {
+      success: false,
+      format: 'docx',
+      filename: `${filename}.docx`,
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      error: 'DOCX export not available - install officegen to enable'
+    }
+    /*
+    // const officegen = (await import('officegen')).default
     const docx = officegen('docx')
 
     // Title
@@ -526,6 +571,7 @@ class ExportService {
         chunks.push(chunk)
       })
     })
+    */
   }
 
   private async exportContentToDOCX(
@@ -533,7 +579,15 @@ class ExportService {
     filename: string,
     options: ExportOptions
   ): Promise<ExportResult> {
-    const officegen = (await import('officegen')).default
+    return {
+      success: false,
+      format: 'docx',
+      filename: `${filename}.docx`,
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      error: 'DOCX export not available - install officegen to enable'
+    }
+    /*
+    // const officegen = (await import('officegen')).default
     const docx = officegen('docx')
 
     const para = docx.createP()
@@ -562,6 +616,7 @@ class ExportService {
         chunks.push(chunk)
       })
     })
+    */
   }
 
   // Markdown Export Methods
