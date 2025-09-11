@@ -5,7 +5,6 @@ import { generationJobOperations } from '@/lib/db/helpers'
 import type { GenerationJobInsert } from '@/lib/types/database'
 
 const RESEARCH_CREDITS = 2
-const FACT_CHECK_CREDITS = 1
 
 // POST /api/research - Perform research on a topic
 export async function POST(request: NextRequest) {

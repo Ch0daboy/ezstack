@@ -4,7 +4,9 @@ import {
   courseOperations, 
   lessonOperations, 
   generationJobOperations,
-  userOperations 
+  userOperations,
+  contentVariationOperations,
+  contentVersionOperations
 } from '@/lib/db/helpers'
 import type { CourseUpdate, LessonUpdate } from '@/lib/types/database'
 
@@ -378,5 +380,127 @@ export const retryFailedGeneration = inngest.createFunction(
     })
 
     return { success: true, jobId }
+  }
+)
+
+// Process content variation generation (YouTube, Blog, Ebook)
+export const processContentVariation = inngest.createFunction(
+  {
+    id: 'process-content-variation',
+    name: 'Process Content Variation Generation',
+    retries: 3,
+  },
+  { event: 'generation/content_variation.requested' },
+  async ({ event, step }) => {
+    const { jobId, userId, courseId, lessonId, config } = event.data as any
+
+    // Step 1: Start the job
+    await step.run('start-job', async () => {
+      await generationJobOperations.startJob(jobId)
+    })
+
+    // Step 2: Get lesson data
+    const lesson = await step.run('get-lesson', async () => {
+      return await lessonOperations.getById(lessonId)
+    })
+
+    if (!lesson.script) {
+      throw new Error('Lesson must have a script to generate variations')
+    }
+
+    // Step 3: Generate variation
+    const { variationType, options = {} } = config
+
+    const { content, metadata } = await step.run('generate-variation', async () => {
+      switch (variationType) {
+        case 'youtube_script': {
+          const yt = await bedrockService.generateYouTubeScript(
+            lesson.title,
+            lesson.objectives,
+            options.duration || 10,
+            { temperature: options.temperature || 0.8 }
+          )
+          return {
+            content: `# ${yt.title}\n\n## Hook (0:00 - 0:15)\n${yt.hook}\n\n## Main Content\n${yt.mainContent}\n\n## Call to Action\n${yt.callToAction}\n\n## Tags\n${yt.tags.join(', ')}\n`,
+            metadata: {
+              title: yt.title,
+              tags: yt.tags,
+              thumbnailPrompt: yt.thumbnailPrompt,
+              duration: options.duration || 10,
+            },
+          }
+        }
+        case 'blog_post': {
+          const blog = await bedrockService.generateBlogPost(
+            lesson.title,
+            lesson.objectives,
+            options.seoKeywords || [],
+            { temperature: options.temperature || 0.7 }
+          )
+          return {
+            content: blog.content,
+            metadata: {
+              title: blog.title,
+              metaDescription: blog.metaDescription,
+              tags: blog.tags,
+              imagePrompts: blog.imagePrompts,
+            },
+          }
+        }
+        case 'ebook_chapter': {
+          const ebook = await bedrockService.generateEbookChapter(
+            lesson.title,
+            lesson.objectives,
+            options.previousContext || '',
+            { temperature: options.temperature || 0.7 }
+          )
+          return {
+            content: ebook.content,
+            metadata: {
+              title: ebook.title,
+              keyTakeaways: ebook.keyTakeaways,
+              exercises: ebook.exercises,
+            },
+          }
+        }
+        default:
+          throw new Error('Invalid variation type')
+      }
+    })
+
+    // Step 4: Save variation
+    const variation = await step.run('save-variation', async () => {
+      return await contentVariationOperations.create({
+        lesson_id: lessonId,
+        type: config.variationType,
+        content,
+        metadata,
+      })
+    })
+
+    // Step 5: Create version record (v1)
+    await step.run('create-version', async () => {
+      await contentVersionOperations.create({
+        content_type: config.variationType,
+        content_id: variation.id,
+        version_number: 1,
+        content: { content, metadata },
+        changes_made: 'Initial generation',
+        is_humanized: false,
+        ai_detection_score: null,
+        created_by: userId,
+      } as any)
+    })
+
+    // Step 6: Complete the job
+    await step.run('complete-job', async () => {
+      await generationJobOperations.completeJob(jobId, {
+        variationId: variation.id,
+        content,
+        metadata,
+      })
+    })
+
+    return { success: true, jobId, variationId: variation.id }
   }
 )

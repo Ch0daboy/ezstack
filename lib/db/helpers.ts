@@ -284,6 +284,41 @@ export const contentVariationOperations = {
   }
 }
 
+// Content Version Operations
+export const contentVersionOperations = {
+  async create(
+    version: import('@/lib/types/database').ContentVersionInsert,
+    isServer = true
+  ) {
+    const supabase = isServer ? await createServerClient() : createBrowserClient()
+    const { data, error } = await supabase
+      .from('content_versions')
+      .insert(version)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data as import('@/lib/types/database').ContentVersion
+  },
+
+  async getByContent(
+    contentType: 'course_outline' | 'lecture_script' | 'ebook_chapter' | 'youtube_script' | 'blog_post',
+    contentId: string,
+    isServer = true
+  ) {
+    const supabase = isServer ? await createServerClient() : createBrowserClient()
+    const { data, error } = await supabase
+      .from('content_versions')
+      .select('*')
+      .eq('content_type', contentType)
+      .eq('content_id', contentId)
+      .order('version_number', { ascending: false })
+
+    if (error) throw error
+    return data as import('@/lib/types/database').ContentVersion[]
+  }
+}
+
 // Template Operations
 export const templateOperations = {
   async getPublic(type?: string, isServer = true) {

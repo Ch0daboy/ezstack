@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { courseOperations, lessonOperations, generationJobOperations } from '@/lib/db/helpers'
+import { courseOperations, generationJobOperations } from '@/lib/db/helpers'
 import { requireCredits, deductCredits } from '@/lib/auth/ensure-user'
 import { inngest } from '@/lib/inngest/client'
 import type { GenerationJobInsert } from '@/lib/types/database'

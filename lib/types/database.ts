@@ -132,6 +132,20 @@ export interface ContentMetadata {
   formatting?: object
 }
 
+// Content Versioning
+export interface ContentVersion {
+  id: string
+  content_type: 'course_outline' | 'lecture_script' | 'ebook_chapter' | 'youtube_script' | 'blog_post'
+  content_id: string
+  version_number: number
+  content: Json
+  changes_made: string | null
+  is_humanized: boolean
+  ai_detection_score: number | null
+  created_at: string
+  created_by: string | null
+}
+
 // Template Types
 export interface Template {
   id: string
@@ -280,6 +294,9 @@ export type LessonUpdate = Partial<LessonInsert>
 
 export type ContentVariationInsert = Omit<ContentVariation, 'id' | 'created_at'>
 export type ContentVariationUpdate = Partial<ContentVariationInsert>
+
+export type ContentVersionInsert = Omit<ContentVersion, 'id' | 'created_at' | 'created_by'>
+export type ContentVersionUpdate = Partial<Omit<ContentVersion, 'id' | 'created_at' | 'created_by'>>
 
 export type TemplateInsert = Omit<Template, 'id' | 'created_at' | 'updated_at'>
 export type TemplateUpdate = Partial<TemplateInsert>
